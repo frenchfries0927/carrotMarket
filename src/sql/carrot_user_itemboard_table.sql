@@ -12,8 +12,8 @@ VALUES
 (5, 'user5', 'password5', 'user5@example.com', 'Daejeon', 36.3504, 127.3845, 'https://www.lorempixel.com/200/200', 'GENERAL');
 INSERT INTO ItemBoard (id, title, description, price, category, status, userId, itemImage)
 VALUES
-(1, 'Stylish Jacket', 'A warm and comfortable jacket for winter.', 49900.00, '의류', 'AVAILABLE', 1, 'https://www.lorempixel.com/709/188'),
-(2, 'Smartphone', 'Latest model with great features.', 999000.00, '전자제품', 'AVAILABLE', 2, 'https://www.lorempixel.com/709/188'),
-(3, 'Mountain Bike', 'Perfect bike for mountain adventures.', 250000.00, '레저', 'RESERVED', 3, 'https://www.lorempixel.com/709/188'),
-(4, 'Antique Vase', 'A beautiful antique vase from the 18th century.', 135000.00, '가구/인테리어', 'SOLD', 4, 'https://www.lorempixel.com/709/188'),
-(5, 'Gaming Console', 'Popular gaming console with two controllers.', 450000.00, '전자제품', 'AVAILABLE', 5, 'https://www.lorempixel.com/709/188');
+(1, 'Stylish Jacket', 'A warm and comfortable jacket for winter.', 49900.00, '의류', 'AVAILABLE', 1, '/itemImages/item1.jpg'),
+(2, 'Smartphone', 'Latest model with great features.', 999000.00, '전자제품', 'AVAILABLE', 2, '/itemImages/item2.jpg'),
+(3, 'Mountain Bike', 'Perfect bike for mountain adventures.', 250000.00, '레저', 'RESERVED', 3, '/itemImages/item3.jpg'),
+(4, 'Antique Vase', 'A beautiful antique vase from the 18th century.', 135000.00, '가구/인테리어', 'SOLD', 4, '/itemImages/item4.jpg'),
+(5, 'Gaming Console', 'Popular gaming console with two controllers.', 450000.00, '전자제품', 'AVAILABLE', 5, '/itemImages/item5.jpg');
