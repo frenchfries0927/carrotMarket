@@ -15,6 +15,7 @@ public class ItemBoardService {
 
     @Autowired
     public ItemBoardService(ItemBoardMapper itemBoardMapper) {
+
         this.itemBoardMapper = itemBoardMapper;
     }
 
@@ -23,6 +24,7 @@ public class ItemBoardService {
     }
 
     public ItemBoard getItemById(Long id) {
+
         return itemBoardMapper.findById(id); // 특정 아이템의 상세 정보를 조회
     }
 }
