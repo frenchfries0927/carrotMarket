@@ -16,6 +16,14 @@ public class UserService {
 
         this.userMapper = userMapper;
     }
+    public User authenticate(String email, String password) {
+        User user = userMapper.findByEmail(email);
+        if (user != null && user.getPassword().equals(password)) {
+            return user;
+        }
+        return null;
+    }
+
     public boolean emailExists(String email) {
         return userMapper.findByEmail(email) != null;
     }

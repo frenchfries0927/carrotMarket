@@ -15,17 +15,7 @@
         .btn-orange:hover { background-color: #e6762d; color: white; }
     </style>
 </head>
-<body onload="showAlert()">
-
-<!-- 회원가입 완료 알림 -->
-<script>
-    function showAlert() {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('registered')) {
-            alert('회원가입이 완료되었습니다!');
-        }
-    }
-</script>
+<body onload="checkLoginError()">
 
 <!-- 네비게이션 바 -->
 <nav class="navbar navbar-expand-lg navbar-light">
@@ -35,11 +25,14 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <!-- 로그인 버튼 (모달 트리거) -->
+            <li class="nav-item" th:if="${session.loggedInUser == null}">
                 <button type="button" class="btn btn-orange" data-toggle="modal" data-target="#loginModal">
                     로그인
                 </button>
+            </li>
+            <li class="nav-item" th:if="${session.loggedInUser != null}">
+                <span class="navbar-text mr-2" th:text="${session.loggedInUser.username + ' 님 안녕하세요'}"></span>
+                <a th:href="@{/logout}" class="btn btn-orange">로그아웃</a>
             </li>
         </ul>
     </div>
@@ -56,14 +49,14 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form>
+                <form action="/login" method="post">
                     <div class="form-group">
                         <label for="email">이메일 주소</label>
-                        <input type="email" class="form-control" id="email" placeholder="이메일을 입력하세요">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="이메일을 입력하세요" required>
                     </div>
                     <div class="form-group">
                         <label for="password">비밀번호</label>
-                        <input type="password" class="form-control" id="password" placeholder="비밀번호를 입력하세요">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
                     </div>
                     <button type="submit" class="btn btn-orange btn-block">로그인</button>
                 </form>
@@ -114,5 +107,17 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    //로그인 체크(이메일 비번이 다른 경우 다시 로그인창으로 리다이렉트
+    function checkLoginError() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('loginError')) {
+            alert('이메일 또는 비밀번호가 잘못되었습니다.');
+            $('#loginModal').modal('show'); // 로그인 모달 다시 표시
+            document.getElementById('password').value = ''; // 비밀번호 필드 지우기
+        }
+    }
+</script>
+
 </body>
 </html>

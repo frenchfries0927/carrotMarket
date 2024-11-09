@@ -137,6 +137,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
+    //회원가입 유효성 검사
     document.getElementById("registerForm").addEventListener("submit", function(event) {
         if (!validateForm()) {
             event.preventDefault();
@@ -157,6 +158,7 @@
         }
     }
 
+    // 이메일 중복 가입 체크
     function checkEmail() {
         const email = document.getElementById('email').value;
         const emailError = document.getElementById('emailError');
@@ -183,6 +185,7 @@
         });
     }
 
+    //프로필 사진 미리보기 기능
     function previewImage(event) {
         const file = event.target.files[0];
         const reader = new FileReader();
@@ -196,6 +199,7 @@
         }
     }
 
+    //사용자 위치 정보 수집 -위도,경도
     function getCurrentLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(success, error);
@@ -217,8 +221,9 @@
         alert("위치 정보를 가져오는 데 실패했습니다.");
     }
 
+    //사용자 위치정보 수집 후 주소로 변환 -사용자에게만 보여주기 위함.
     function convertLatLngToAddress(latitude, longitude) {
-        const apiKey = "AIzaSyAGgvPzN57_n5tGKb1sNvZJgg6Ogiv1CkY";
+        const apiKey = "AIzaSyAGgvPzN57_n5tGKb1sNvZJgg6Ogiv1CkY"; //구글 (Geocoding API) key 사용
         const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
 
         $.getJSON(url, function(data) {
