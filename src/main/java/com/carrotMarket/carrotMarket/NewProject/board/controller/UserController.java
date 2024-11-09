@@ -20,6 +20,6 @@ public class UserController {
     public String registerUser(@ModelAttribute("user") User user) {
         // 사용자 정보를 데이터베이스에 저장하는 로직 추가
         // userService.save(user);
-        return "redirect:/login"; // 회원가입 완료 후 로그인 페이지로 리디렉션
+        return "redirect:/list"; // 회원가입 완료 후 list.html 페이지로 리디렉션
     }
 }
