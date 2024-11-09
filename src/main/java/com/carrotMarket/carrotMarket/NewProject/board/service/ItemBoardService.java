@@ -20,6 +20,7 @@ public class ItemBoardService {
     }
 
     public List<ItemBoard> getAvailableItems() {
+
         return itemBoardMapper.findAvailableItems(); // 판매 중인 아이템 리스트를 조회
     }
 

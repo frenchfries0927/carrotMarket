@@ -1,7 +1,25 @@
- CREATE TABLE User ( id BIGINT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, location VARCHAR(255) COMMENT '사용자 주소 저장 (서울특별시 형태)', latitude DECIMAL(10, 7) COMMENT '위도', longitude DECIMAL(10, 7) COMMENT '경도', profileImage VARCHAR(255), createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, userGroup ENUM('ADMIN', 'GENERAL') NOT NULL COMMENT 'ADMIN/GENERAL 구분'
+ CREATE TABLE User (
+     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+     username VARCHAR(255) NOT NULL,
+     password VARCHAR(255) NOT NULL,
+     email VARCHAR(255) NOT NULL,
+     location VARCHAR(255) COMMENT '사용자 주소 저장 (서울특별시 형태)',
+     latitude DECIMAL(10, 7) COMMENT '위도',
+     longitude DECIMAL(10, 7) COMMENT '경도',
+     profileImage VARCHAR(255),
+     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     userGroup ENUM('ADMIN', 'GENERAL') NOT NULL COMMENT 'ADMIN/GENERAL 구분'
 );
 
- CREATE TABLE ItemBoard ( id BIGINT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255) NOT NULL, description TEXT, price DECIMAL(15, 2) NOT NULL COMMENT '가격 정보', category VARCHAR(255) NOT NULL COMMENT '임시 카테고리 필드', status ENUM('AVAILABLE', 'RESERVED', 'SOLD') NOT NULL COMMENT '물품 상태', createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, userId BIGINT NOT NULL, itemImage VARCHAR(255) COMMENT '이미지 저장 경로', FOREIGN KEY (userId) REFERENCES User(id) ON DELETE CASCADE
+ CREATE TABLE ItemBoard ( id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                          title VARCHAR(255) NOT NULL,
+                          description TEXT,
+                          price DECIMAL(15, 2) NOT NULL COMMENT '가격 정보',
+                          category VARCHAR(255) NOT NULL COMMENT '임시 카테고리 필드',
+                          status ENUM('AVAILABLE', 'RESERVED', 'SOLD') NOT NULL COMMENT '물품 상태',
+                          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, userId BIGINT NOT NULL,
+                          itemImage VARCHAR(255) COMMENT '이미지 저장 경로',
+                          FOREIGN KEY (userId) REFERENCES User(id) ON DELETE CASCADE
 );
 INSERT INTO User (id, username, password, email, location, latitude, longitude, profileImage, userGroup)
 VALUES

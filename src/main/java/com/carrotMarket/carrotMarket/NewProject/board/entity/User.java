@@ -1,9 +1,6 @@
 package com.carrotMarket.carrotMarket.NewProject.board.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.sql.Timestamp;
 
@@ -11,6 +8,7 @@ import java.sql.Timestamp;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter @Setter
 public class User {
     private Long id;
     private String username;
@@ -21,5 +19,5 @@ public class User {
     private Double longitude;
     private String profileImage;
     private Timestamp createdAt;
-    private String groupType; // ADMIN or GENERAL
+    private String userGroup; // ADMIN or GENERAL
 }
