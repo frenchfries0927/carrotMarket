@@ -65,6 +65,13 @@
                 <span>아직 회원이 아니신가요?</span>
                 <a href="/register" class="ml-2">회원가입</a>
             </div>
+            <!-- 카카오 로그인 버튼 -->
+            <div class="text-center mt-3">
+                <button type="button" onclick="kakaoLogin()" class="btn btn-warning btn-block" style="background-color: #FEE500; color: #3C1E1E; font-weight: bold;">
+                    카카오 로그인
+                </button>
+            </div>
+
         </div>
     </div>
 </div>
@@ -107,7 +114,9 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
 <script>
+
     //로그인 체크(이메일 비번이 다른 경우 다시 로그인창으로 리다이렉트
     function checkLoginError() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -116,6 +125,51 @@
             $('#loginModal').modal('show'); // 로그인 모달 다시 표시
             document.getElementById('password').value = ''; // 비밀번호 필드 지우기
         }
+    }
+    // 카카오 SDK 초기화
+    Kakao.init('927a95bf736c3c38b71efd1f892afae4'); // JavaScript 키
+
+
+    // 카카오 로그인 함수
+    function kakaoLogin() {
+        Kakao.Auth.login({
+            success: function(authObj) {
+                // 로그인 성공 시, 사용자 정보 요청
+                Kakao.API.request({
+                    url: '/v2/user/me',
+                    success: function(res) {
+                        const kakaoAccount = res.kakao_account;
+                        const email = kakaoAccount.email;
+                        const nickname = kakaoAccount.profile.nickname;
+
+                        // 서버로 카카오 계정 정보를 전송
+                        $.ajax({
+                            url: '/kakaoLogin',
+                            method: 'POST',
+                            data: { email: email, username: nickname },
+                            success: function(response) {
+                                if (response.success) {
+                                    window.location.href = '/';
+                                } else {
+                                    alert('로그인에 실패했습니다.');
+                                }
+                            },
+                            error: function() {
+                                alert('로그인 요청 중 오류가 발생했습니다.');
+                            }
+                        });
+                    },
+                    fail: function(error) {
+                        console.log(error);
+                        alert('사용자 정보 요청에 실패했습니다.');
+                    }
+                });
+            },
+            fail: function(err) {
+                alert('카카오 로그인에 실패했습니다.');
+                console.log(err);
+            }
+        });
     }
 </script>
 

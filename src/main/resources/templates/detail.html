@@ -5,22 +5,65 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>당근마켓 클론 - 상품 상세</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #ffffff; /* 배경색을 흰색으로 변경 */
+      color: #333;
+    }
+    .navbar {
+      background-color: #ff8a3d;
+    }
+    .card {
+      background-color: #f8f9fa;
+      border: none;
+    }
+    .btn-orange {
+      background-color: #ff8a3d;
+      color: white;
+    }
+    .btn-orange:hover {
+      background-color: #e07b36;
+      color: white;
+    }
+    .product-info {
+      color: #555;
+    }
+  </style>
 </head>
 <body>
+
 <!-- 네비게이션 바 -->
-<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #ff8a3d;">
+<nav class="navbar navbar-expand-lg navbar-light">
   <a class="navbar-brand" href="#" style="color: white;">당근마켓</a>
 </nav>
 
 <div class="container mt-5">
-  <div class="card mb-3">
-    <img th:src="${item.itemImage}" class="card-img-top" alt="상품 이미지">
-    <div class="card-body">
-      <h5 class="card-title" th:text="${item.title}">상품명</h5>
-      <p class="card-text text-muted" th:text="'₩ ' + ${item.price}">가격</p>
-      <p class="card-text" th:text="${item.description}">상품 설명</p>
-      <p class="card-text"><small class="text-muted" th:text="${item.location}">위치 정보</small></p>
-      <a href="/board/list" class="btn btn-orange">목록으로 돌아가기</a>
+  <div class="row">
+    <!-- 상품 이미지 섹션 -->
+    <div class="col-md-6">
+      <div class="card mb-3">
+        <img th:src="${item.itemImage}" class="card-img-top" alt="상품 이미지">
+      </div>
+    </div>
+
+    <!-- 상품 정보 섹션 -->
+    <div class="col-md-6">
+      <h3 th:text="${item.title}" class="font-weight-bold">상품명</h3>
+      <p class="product-info" th:text="'₩ ' + ${item.price}">가격</p>
+      <p class="product-info" th:text="${item.description}">상품 설명</p>
+      <p class="product-info"><small th:text="${user.location}">위치 정보</small></p>
+
+      <!-- 판매자 정보 -->
+      <div class="d-flex align-items-center mt-4">
+        <img src="https://via.placeholder.com/50" class="rounded-circle mr-3" alt="판매자 프로필 사진">
+        <div>
+          <h5 class="mb-0" th:text="${user.username}">판매자명</h5>
+          <p class="text-muted mb-0" th:text="${user.location}">지역</p>
+        </div>
+      </div>
+
+      <!-- 주황색 버튼 -->
+      <a href="#" class="btn btn-orange btn-lg mt-4">채팅하러 가기</a>
     </div>
   </div>
 </div>
