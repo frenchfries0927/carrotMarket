@@ -51,22 +51,44 @@ public class UserController {
     }
 
     //로그인
-    @PostMapping("/login")
-    public String login(@RequestParam String email, @RequestParam String password, HttpSession session) {
-        User user = userService.authenticate(email, password);
-        if (user != null) {
-            session.setAttribute("loggedInUser", user); // 세션에 사용자 정보 저장
-            return "redirect:/board/list";
-        } else {
-           // return "redirect:/?loginError=true";
-            return "redirect:/board/list?loginError=true"; // 로그인 실패 시 loginError 매개변수 추가
-        }
-    }
+//    @PostMapping("/login")
+//    public String login(@RequestParam String email, @RequestParam String password, HttpSession session) {
+//        User user = userService.authenticate(email, password);
+//        if (user != null) {
+//            session.setAttribute("loggedInUser", user); // 세션에 사용자 정보 저장
+//            return "redirect:/board/list";
+//        } else {
+//           // return "redirect:/?loginError=true";
+//            return "redirect:/board/list?loginError=true"; // 로그인 실패 시 loginError 매개변수 추가
+//        }
+//    }
     //로그아웃
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate(); // 세션 무효화
         return "redirect:/board/list";
+    }
+    //로그인(위치정보 수집)
+    @PostMapping("/login")
+    public String login(
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude,
+            @RequestParam(required = false) String location,
+            HttpSession session) {
+        // 회원 인증
+        User user = userService.authenticate(email, password);
+        if (user != null) {
+            // 위치 정보 업데이트
+            if (latitude != null && longitude != null && location != null) {
+                userService.updateUserLocation(user.getId(), latitude, longitude, location);
+            }
+            session.setAttribute("loggedInUser", user); // 세션에 사용자 정보 저장
+            return "redirect:/board/list";
+        } else {
+            return "redirect:/board/list?loginError=true";
+        }
     }
     
     //이메일 중복가입 체크
@@ -78,6 +100,7 @@ public class UserController {
         response.put("exists", exists);
         return response;
     }
+
     @PostMapping("/kakaoLogin")
     @ResponseBody
     public String kakaoLogin(@RequestParam String email, @RequestParam String username, HttpSession session) {
