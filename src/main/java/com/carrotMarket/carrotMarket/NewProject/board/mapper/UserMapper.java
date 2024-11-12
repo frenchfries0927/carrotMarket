@@ -27,4 +27,5 @@ public interface UserMapper {
 
     @Delete("DELETE FROM user WHERE id = #{id}")
     void deleteUser(Long id);
+
 }

@@ -78,6 +78,22 @@ public class UserController {
         response.put("exists", exists);
         return response;
     }
+    @PostMapping("/kakaoLogin")
+    @ResponseBody
+    public String kakaoLogin(@RequestParam String email, @RequestParam String username, HttpSession session) {
+        User user = userService.findByEmail(email);
+        if (user == null) {
+            user = new User();
+            user.setEmail(email);
+            user.setUsername(username);
+            userService.save(user);
+        }
+        session.setAttribute("loggedInUser", user);
+        return "redirect:/board/list";
+    }
+
+
+
 
 //    @PostMapping("/register")
 //    public String registerUser(@ModelAttribute("user") User user,
