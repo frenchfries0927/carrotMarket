@@ -19,6 +19,7 @@ public class ItemBoardController {
 
     @Autowired
     public ItemBoardController(ItemBoardService itemBoardService) {
+
         this.itemBoardService = itemBoardService;
     }
 
