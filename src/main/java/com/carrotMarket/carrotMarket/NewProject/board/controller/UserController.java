@@ -83,7 +83,7 @@ public class UserController {
         }
     }
 
-<<<<<<< HEAD
+
     //로그인
 //    @PostMapping("/login")
 //    public String login(@RequestParam String email, @RequestParam String password, HttpSession session) {
@@ -96,26 +96,27 @@ public class UserController {
 //            return "redirect:/board/list?loginError=true"; // 로그인 실패 시 loginError 매개변수 추가
 //        }
 //    }
-    //로그아웃
-=======
-    @PostMapping("/login")
-    public String login(@RequestParam String email, @RequestParam String password, HttpSession session) {
-        User user = userService.authenticate(email, password);
-        if (user != null) {
-            session.setAttribute("loggedInUser", user);
-            return "redirect:/board/list";
-        } else {
-            return "redirect:/board/list?loginError=true";
-        }
-    }
 
->>>>>>> f089338 (trash)
+
+//    @PostMapping("/login")
+//    public String login(@RequestParam String email, @RequestParam String password, HttpSession session) {
+//        User user = userService.authenticate(email, password);
+//        if (user != null) {
+//            session.setAttribute("loggedInUser", user);
+//            return "redirect:/board/list";
+//        } else {
+//            return "redirect:/board/list?loginError=true";
+//        }
+//    }
+
+
+    //로그아웃
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/board/list";
     }
-<<<<<<< HEAD
+
     //로그인(위치정보 수집)
     @PostMapping("/login")
     public String login(
@@ -140,9 +141,6 @@ public class UserController {
     }
     
     //이메일 중복가입 체크
-=======
-
->>>>>>> f089338 (trash)
     @PostMapping("/check-email")
     @ResponseBody
     public Map<String, Boolean> checkEmail(@RequestParam("email") String email) {
@@ -165,7 +163,6 @@ public class UserController {
         session.setAttribute("loggedInUser", user);
         return "redirect:/board/list";
     }
-<<<<<<< HEAD
 
 
 
@@ -211,6 +208,5 @@ public class UserController {
 //        session.setAttribute("loggedInUser", user); // 세션에 사용자 정보 저장
 //        return "redirect:/board/list?registered=true"; // 회원가입 완료 시 list 페이지로 리디렉션
 //    }
-=======
->>>>>>> f089338 (trash)
+
 }
