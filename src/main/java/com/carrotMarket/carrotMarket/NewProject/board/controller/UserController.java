@@ -62,7 +62,8 @@ public class UserController {
 
     private String saveProfileImage(MultipartFile profileImageFile) {
         try {
-            Path uploadPath = Paths.get(uploadDir);
+            Path uploadPath = Paths.get(uploadDir).toAbsolutePath();
+
 
             // 디렉토리가 존재하지 않으면 생성
             if (!Files.exists(uploadPath)) {
