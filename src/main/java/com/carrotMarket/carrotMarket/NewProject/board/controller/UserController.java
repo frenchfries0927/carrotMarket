@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -24,6 +25,16 @@ public class UserController {
 
     private final UserService userService;
     private final ServletContext servletContext;
+
+    // application.properties에 설정된 API 키를 가져옴
+    @Value("${google.api.key}")
+    private String apiKey;
+    // kakao 주소 api JavaScript 키 가져오기
+    @Value("${kakao.api.javascript.key}")
+    private String kakaoJavascriptKey;
+    //profile upload folder
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     @Autowired
     public UserController(UserService userService, ServletContext servletContext) {
@@ -41,52 +52,68 @@ public class UserController {
     @PostMapping("/register")
     public String registerUser(@ModelAttribute("user") User user,
                                @RequestParam("profileImageFile") MultipartFile profileImageFile,
-                               HttpSession session) {
-        user.setUserGroup("GENERAL");
+                               HttpSession session) throws IOException {
+        //중복되는 코드....service 단 saveOrUpdateUser 에서 동일하게 수행.
+//        if (!profileImageFile.isEmpty()) {
+//            String filePath = saveProfileImage(profileImageFile, user);
+//            if (filePath == null) {
+//                return "register";
+//            }
+//            user.setProfileImage(filePath);
+//        }
 
-        if (!profileImageFile.isEmpty()) {
-            String filePath = saveProfileImage(profileImageFile);
-            if (filePath == null) {
-                return "register";
-            }
-            user.setProfileImage(filePath);
-        }
+//        userService.save(user);
+//        userService.saveOrUpdateUser(user, profileImageFile);
+//        session.setAttribute("loggedInUser", user);
+//
+//        return "redirect:/board/list";
 
-        userService.save(user);
-        session.setAttribute("loggedInUser", user);
-
-        return "redirect:/board/list";
-    }
-
-    @Value("${file.upload-dir}")
-    private String uploadDir;
-
-    private String saveProfileImage(MultipartFile profileImageFile) {
         try {
-//            참고 https://chaemin0707.tistory.com/26
-//            path = "D:\carrotMarket\."
-//            root = "D:\"
-            Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
-//            Path normalize = Paths.get(uploadDir).toAbsolutePath().normalize();
-
-
-            // 디렉토리가 존재하지 않으면 생성
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            // 파일 이름을 고유하게 설정
-            String fileName = System.currentTimeMillis() + "_" + profileImageFile.getOriginalFilename();
-            Path filePath = uploadPath.resolve(fileName);
-            profileImageFile.transferTo(filePath.toFile());
-
-            // 저장된 파일 경로 반환 (정적 리소스 접근 경로로 설정)
-            return "/profileImages/" + fileName;
+            userService.saveOrUpdateUser(user, profileImageFile);
+            session.setAttribute("loggedInUser", user);
+            return "redirect:/board/list"; // 회원가입 완료 후 로그인 페이지로 리디렉션
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
+            return "redirect:/register?error=true";
         }
     }
+
+//    private String saveProfileImage(MultipartFile profileImageFile, User user){
+//        try {
+////            참고 https://chaemin0707.tistory.com/26
+//            Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+//
+//            // 디렉토리가 존재하지 않으면 생성
+//            if (!Files.exists(uploadPath)) {
+//                Files.createDirectories(uploadPath);
+//            }
+//
+//            // 파일 확장자 추출
+//            String originalFileName = profileImageFile.getOriginalFilename();
+//            String fileExtension = null;
+//            if (originalFileName != null) {
+//                fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+//            }
+//
+//            // 사용자 이메일과 파일 확장자를 포함하여 파일 이름을 고유하게 설정
+//            String fileName = user.getEmail() + fileExtension;
+//            Path filePath = uploadPath.resolve(fileName);
+//
+//            // 동일한 이름의 파일이 있으면 삭제하여 덮어쓰기 준비
+//            if (Files.exists(filePath)) {
+//                Files.delete(filePath);
+//            }
+//
+//            // 파일 저장
+//            profileImageFile.transferTo(filePath.toFile());
+//
+//            // 저장된 파일 경로 반환 (정적 리소스 접근 경로로 설정)
+//            return "/profileImages/" + fileName;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
     
 
     //로그아웃
@@ -94,6 +121,14 @@ public class UserController {
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/board/list";
+    }
+    @GetMapping("/get-address")
+    @ResponseBody
+    public String getAddress(@RequestParam double latitude, @RequestParam double longitude) {
+        String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&key=" + apiKey+ "&language=ko";
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.getForObject(url, String.class);
+
     }
 
     //로그인(위치정보 수집)
@@ -141,6 +176,61 @@ public class UserController {
         }
         session.setAttribute("loggedInUser", user);
         return "redirect:/board/list";
+    }
+    //프로필 수정하기.
+    @GetMapping("/edit-profile")
+    public String editProfile(Model model, HttpSession session) {
+        User user = userService.getLoggedInUser(session);
+        model.addAttribute("user", user);
+        // Kakao JavaScript API 키를 모델에 추가
+        model.addAttribute("kakaoJavascriptKey", kakaoJavascriptKey);
+        return "edit-profile";
+    }
+    // 프로필 업데이트
+    @PostMapping("/edit-profile")
+    public String updateProfile(@ModelAttribute User user,
+                                @RequestParam("currentPassword") String currentPassword,
+                                @RequestParam("profileImageFile") MultipartFile profileImageFile,
+                                HttpSession session) {
+        try {
+            // 기존 사용자의 ID, group 설정
+            user.setId(userService.getLoggedInUser(session).getId());
+            user.setUserGroup(userService.getLoggedInUser(session).getUserGroup());
+
+            User loggedInUser = userService.getLoggedInUser(session);
+
+            // 현재 비밀번호 확인
+            if (!loggedInUser.getPassword().equals(currentPassword)) {
+                return "redirect:/edit-profile?error=passwordMismatch";
+            }
+
+            // 새 비밀번호가 입력되지 않은 경우 현재 비밀번호로 유지
+            if (user.getPassword() == null || user.getPassword().isEmpty()) {
+                user.setPassword(loggedInUser.getPassword());
+            }
+
+            // 프로필 이미지와 기타 정보 업데이트
+            userService.saveOrUpdateUser(user, profileImageFile);
+
+            // 세션에 업데이트된 사용자 정보 저장
+            session.setAttribute("loggedInUser", user);
+            return "redirect:/board/list"; // 프로필 페이지로 리디렉션
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "redirect:/edit-profile?error=true";
+        }
+    }
+
+
+    //입력받은 주소로 위도,경도 갱신하기.
+    @GetMapping("/get-latlng")
+    @ResponseBody
+    public String getLatLng(@RequestParam("address") String address) {
+        String url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + address + "&key=" + apiKey;
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(url, String.class);
+        return response; // API의 JSON 응답을 클라이언트에 반환
     }
 
 
