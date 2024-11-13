@@ -184,8 +184,7 @@
     }
 
     // 카카오 SDK 초기화
-    Kakao.init('927a95bf736c3c38b71efd1f892afae4'); // JavaScript 키
-
+    Kakao.init('927a95bf736c3c38b71efd1f892afae4'); // 실제 JavaScript 키로 변경
 
     // 카카오 로그인 함수
     function kakaoLogin() {
@@ -196,25 +195,32 @@
                     url: '/v2/user/me',
                     success: function(res) {
                         const kakaoAccount = res.kakao_account;
-                        const email = kakaoAccount.email;
-                        const nickname = kakaoAccount.profile.nickname;
 
-                        // 서버로 카카오 계정 정보를 전송
-                        $.ajax({
-                            url: '/kakaoLogin',
-                            method: 'POST',
-                            data: { email: email, username: nickname },
-                            success: function(response) {
-                                if (response.success) {
-                                    window.location.href = '/';
-                                } else {
-                                    alert('로그인에 실패했습니다.');
+                        // 이메일 정보 확인
+                        if (kakaoAccount.email) {
+                            const email = kakaoAccount.email;
+                            const nickname = kakaoAccount.profile.nickname;
+
+                            // 서버로 카카오 계정 정보를 전송
+                            $.ajax({
+                                url: '/kakaoLogin',
+                                method: 'POST',
+                                data: { email: email, username: nickname },
+                                success: function(response) {
+                                    if (response.success) {
+                                        window.location.href = '/';
+                                    } else {
+                                        alert('로그인에 실패했습니다.');
+                                    }
+                                },
+                                error: function() {
+                                    alert('로그인 요청 중 오류가 발생했습니다.');
                                 }
-                            },
-                            error: function() {
-                                alert('로그인 요청 중 오류가 발생했습니다.');
-                            }
-                        });
+                            });
+                        } else {
+                            // 이메일 정보가 없는 경우의 처리
+                            alert('이메일 정보를 제공받을 수 없습니다. 카카오 계정 설정에서 이메일 정보 제공 동의를 확인해주세요.');
+                        }
                     },
                     fail: function(error) {
                         console.log(error);
@@ -228,6 +234,7 @@
             }
         });
     }
+
 </script>
 
 </body>

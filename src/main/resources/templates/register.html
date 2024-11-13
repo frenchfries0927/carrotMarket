@@ -114,14 +114,14 @@
                 <input type="hidden" id="latitude" th:field="*{latitude}">
                 <input type="hidden" id="longitude" th:field="*{longitude}">
 
-<!--                &lt;!&ndash; Profile Image Upload &ndash;&gt;-->
-<!--                <div class="form-group">-->
-<!--                    <label for="profileImage">프로필 이미지</label>-->
-<!--                    <div class="mb-3 text-center">-->
-<!--                        <img id="profileImagePreview" src="https://via.placeholder.com/150" alt="프로필 이미지 미리 보기" class="img-thumbnail" style="max-width: 150px;">-->
-<!--                    </div>-->
-<!--                    <input type="file" class="form-control-file" id="profileImage" name="profileImage" accept="image/*" onchange="previewImage(event)">-->
-<!--                </div>-->
+                <!-- Profile Image Upload -->
+                <div class="form-group">
+                    <label for="profileImage">프로필 이미지</label>
+                    <div class="mb-3 text-center">
+                        <img id="profileImagePreview" src="https://via.placeholder.com/150" alt="프로필 이미지 미리 보기" class="img-thumbnail" style="max-width: 150px;">
+                    </div>
+                    <input type="file" class="form-control-file" id="profileImage" name="profileImageFile" accept="image/*" onchange="previewImage(event)">
+                </div>
 
 
                 <!-- Submit Button -->

@@ -7,6 +7,12 @@ import com.carrotMarket.carrotMarket.NewProject.board.mapper.UserMapper;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Service
 public class UserService {
@@ -57,6 +63,33 @@ public class UserService {
         // 세션에 사용자 정보를 저장하여 로그인 상태 유지
         session.setAttribute("loggedInUser", user);
         return user;
+    }
+    // 프로필 이미지 저장 메소드
+    public String saveProfileImage(MultipartFile profileImage) {
+        if (profileImage.isEmpty()) {
+            return null;
+        }
+
+        try {
+            String uploadDir = "src/main/resources/static/profileImages/";
+            Path uploadPath = Paths.get(uploadDir);
+
+            // 디렉토리가 존재하지 않으면 생성
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            // 파일 이름을 고유하게 설정 (예: 시간 기반 파일명)
+            String fileName = System.currentTimeMillis() + "_" + profileImage.getOriginalFilename();
+            Path filePath = uploadPath.resolve(fileName);
+            profileImage.transferTo(filePath.toFile());
+
+            // 저장된 파일 경로 반환
+            return "/profileImages/" + fileName;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     //로그인 시 사용자 위치 정보  update

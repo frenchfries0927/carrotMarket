@@ -1,13 +1,13 @@
 package com.carrotMarket.carrotMarket.NewProject.board.controller;
 
 import com.carrotMarket.carrotMarket.NewProject.board.entity.User;
-import com.carrotMarket.carrotMarket.NewProject.board.service.ItemBoardService;
 import com.carrotMarket.carrotMarket.NewProject.board.service.UserService;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,32 +23,66 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
+    private final ServletContext servletContext;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ServletContext servletContext) {
         this.userService = userService;
+        this.servletContext = servletContext;
     }
 
-    //회원가입
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new User());
-        return "register"; // 회원가입 폼 페이지의 이름 (register.html)
+        return "register";
     }
 
-    // 회원가입 완료
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute("user") User user, HttpSession session) {
-        // 사용자 정보를 데이터베이스에 저장하는 로직 추가
+    public String registerUser(@ModelAttribute("user") User user,
+                               @RequestParam("profileImageFile") MultipartFile profileImageFile,
+                               HttpSession session) {
         user.setUserGroup("GENERAL");
+
+        if (!profileImageFile.isEmpty()) {
+            String filePath = saveProfileImage(profileImageFile);
+            if (filePath == null) {
+                return "register";
+            }
+            user.setProfileImage(filePath);
+        }
+
         userService.save(user);
+        session.setAttribute("loggedInUser", user);
 
-        // 회원 가입 후 자동 로그인
-        session.setAttribute("loggedInUser", user); // 세션에 사용자 정보 저장
-
-        return "redirect:/board/list"; // 회원가입 완료 후 list.html 페이지로 리디렉션
+        return "redirect:/board/list";
     }
 
+    @Value("${file.upload-dir}")
+    private String uploadDir;
+
+    private String saveProfileImage(MultipartFile profileImageFile) {
+        try {
+            Path uploadPath = Paths.get(uploadDir);
+
+            // 디렉토리가 존재하지 않으면 생성
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            // 파일 이름을 고유하게 설정
+            String fileName = System.currentTimeMillis() + "_" + profileImageFile.getOriginalFilename();
+            Path filePath = uploadPath.resolve(fileName);
+            profileImageFile.transferTo(filePath.toFile());
+
+            // 저장된 파일 경로 반환 (정적 리소스 접근 경로로 설정)
+            return "/profileImages/" + fileName;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+<<<<<<< HEAD
     //로그인
 //    @PostMapping("/login")
 //    public String login(@RequestParam String email, @RequestParam String password, HttpSession session) {
@@ -63,11 +96,25 @@ public class UserController {
 //        }
 //    }
     //로그아웃
+=======
+    @PostMapping("/login")
+    public String login(@RequestParam String email, @RequestParam String password, HttpSession session) {
+        User user = userService.authenticate(email, password);
+        if (user != null) {
+            session.setAttribute("loggedInUser", user);
+            return "redirect:/board/list";
+        } else {
+            return "redirect:/board/list?loginError=true";
+        }
+    }
+
+>>>>>>> f089338 (trash)
     @GetMapping("/logout")
     public String logout(HttpSession session) {
-        session.invalidate(); // 세션 무효화
+        session.invalidate();
         return "redirect:/board/list";
     }
+<<<<<<< HEAD
     //로그인(위치정보 수집)
     @PostMapping("/login")
     public String login(
@@ -92,6 +139,9 @@ public class UserController {
     }
     
     //이메일 중복가입 체크
+=======
+
+>>>>>>> f089338 (trash)
     @PostMapping("/check-email")
     @ResponseBody
     public Map<String, Boolean> checkEmail(@RequestParam("email") String email) {
@@ -114,6 +164,7 @@ public class UserController {
         session.setAttribute("loggedInUser", user);
         return "redirect:/board/list";
     }
+<<<<<<< HEAD
 
 
 
@@ -159,4 +210,6 @@ public class UserController {
 //        session.setAttribute("loggedInUser", user); // 세션에 사용자 정보 저장
 //        return "redirect:/board/list?registered=true"; // 회원가입 완료 시 list 페이지로 리디렉션
 //    }
+=======
+>>>>>>> f089338 (trash)
 }
