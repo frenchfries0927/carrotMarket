@@ -28,4 +28,8 @@ public interface UserMapper {
     @Delete("DELETE FROM user WHERE id = #{id}")
     void deleteUser(Long id);
 
+    @Update("UPDATE user SET location = #{location}, latitude = #{latitude}, longitude = #{longitude} WHERE id = #{userId}")
+    void updateLocation(Long userId, Double latitude, Double longitude, String location);
+
+
 }

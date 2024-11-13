@@ -32,11 +32,13 @@ public class UserService {
         return null;
     }
     public User findByEmail(String email) {
+
         return userMapper.findByEmail(email);
     }
 
 
     public boolean emailExists(String email) {
+
         return userMapper.findByEmail(email) != null;
     }
     public void save(User user) {
@@ -55,6 +57,11 @@ public class UserService {
         // 세션에 사용자 정보를 저장하여 로그인 상태 유지
         session.setAttribute("loggedInUser", user);
         return user;
+    }
+
+    //로그인 시 사용자 위치 정보  update
+    public void updateUserLocation(Long userId, Double latitude, Double longitude, String location) {
+        userMapper.updateLocation(userId, latitude, longitude, location);
     }
 
 

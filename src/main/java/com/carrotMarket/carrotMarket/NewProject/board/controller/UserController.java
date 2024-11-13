@@ -51,22 +51,44 @@ public class UserController {
     }
 
     //로그인
-    @PostMapping("/login")
-    public String login(@RequestParam String email, @RequestParam String password, HttpSession session) {
-        User user = userService.authenticate(email, password);
-        if (user != null) {
-            session.setAttribute("loggedInUser", user); // 세션에 사용자 정보 저장
-            return "redirect:/board/list";
-        } else {
-           // return "redirect:/?loginError=true";
-            return "redirect:/board/list?loginError=true"; // 로그인 실패 시 loginError 매개변수 추가
-        }
-    }
+//    @PostMapping("/login")
+//    public String login(@RequestParam String email, @RequestParam String password, HttpSession session) {
+//        User user = userService.authenticate(email, password);
+//        if (user != null) {
+//            session.setAttribute("loggedInUser", user); // 세션에 사용자 정보 저장
+//            return "redirect:/board/list";
+//        } else {
+//           // return "redirect:/?loginError=true";
+//            return "redirect:/board/list?loginError=true"; // 로그인 실패 시 loginError 매개변수 추가
+//        }
+//    }
     //로그아웃
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate(); // 세션 무효화
         return "redirect:/board/list";
+    }
+    //로그인(위치정보 수집)
+    @PostMapping("/login")
+    public String login(
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude,
+            @RequestParam(required = false) String location,
+            HttpSession session) {
+        // 회원 인증
+        User user = userService.authenticate(email, password);
+        if (user != null) {
+            // 위치 정보 업데이트
+            if (latitude != null && longitude != null && location != null) {
+                userService.updateUserLocation(user.getId(), latitude, longitude, location);
+            }
+            session.setAttribute("loggedInUser", user); // 세션에 사용자 정보 저장
+            return "redirect:/board/list";
+        } else {
+            return "redirect:/board/list?loginError=true";
+        }
     }
     
     //이메일 중복가입 체크
@@ -78,6 +100,7 @@ public class UserController {
         response.put("exists", exists);
         return response;
     }
+
     @PostMapping("/kakaoLogin")
     @ResponseBody
     public String kakaoLogin(@RequestParam String email, @RequestParam String username, HttpSession session) {
@@ -95,10 +118,11 @@ public class UserController {
 
 
 
-    //    @PostMapping("/register")
+//    @PostMapping("/register")
 //    public String registerUser(@ModelAttribute("user") User user,
 //                               @RequestParam("profileImage") MultipartFile profileImage,
-//                               BindingResult bindingResult) {
+//                               BindingResult bindingResult,
+//                               HttpSession session) {
 //        if (bindingResult.hasErrors()) {
 //            return "register";
 //        }
@@ -120,14 +144,19 @@ public class UserController {
 //                profileImage.transferTo(filePath.toFile());
 //
 //                // 저장된 파일 경로를 User 엔티티의 profileImage 필드에 설정
-//                user.setProfileImage("/profileImages/" + fileName);
+//                user.setProfileImage("/profileImages/" + fileName); // 문자열 경로로 저장
 //            } catch (IOException e) {
 //                e.printStackTrace();
 //                return "register"; // 파일 저장 오류 발생 시 다시 회원가입 페이지로 이동
 //            }
 //        }
 //
+//        // 사용자 정보를 데이터베이스에 저장하는 로직 추가
+//        user.setUserGroup("GENERAL");
 //        userService.save(user);
+//
+//        // 회원 가입 후 자동 로그인
+//        session.setAttribute("loggedInUser", user); // 세션에 사용자 정보 저장
 //        return "redirect:/board/list?registered=true"; // 회원가입 완료 시 list 페이지로 리디렉션
 //    }
 }

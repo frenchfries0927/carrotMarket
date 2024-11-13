@@ -49,7 +49,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/login" method="post">
+                <form id="loginForm" action="/login" method="post">
                     <div class="form-group">
                         <label for="email">이메일 주소</label>
                         <input type="email" class="form-control" id="email" name="email" placeholder="이메일을 입력하세요" required>
@@ -58,7 +58,12 @@
                         <label for="password">비밀번호</label>
                         <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
                     </div>
-                    <button type="submit" class="btn btn-orange btn-block">로그인</button>
+                    <!--로그인 시 사용자 위치 정보 수집-->
+                    <input type="hidden" id="latitude" name="latitude">
+                    <input type="hidden" id="longitude" name="longitude">
+                    <input type="hidden" id="location" name="location">
+<!--                    <button type="submit" class="btn btn-orange btn-block" onclick="getLocationAndSubmit()">로그인</button>-->
+                    <button type="submit" class="btn btn-orange btn-block" onclick="event.preventDefault(); getLocationAndSubmit();">로그인</button>
                 </form>
             </div>
             <div class="modal-footer">
@@ -126,6 +131,58 @@
             document.getElementById('password').value = ''; // 비밀번호 필드 지우기
         }
     }
+    //로그인 시 위치정보 가져오기.
+    function getLocationAndSubmit() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                // 위도와 경도를 hidden input 필드에 설정
+                document.getElementById('latitude').value = latitude;
+                document.getElementById('longitude').value = longitude;
+
+                // 위치 정보를 주소로 변환 후 폼 제출
+                convertLatLngToAddress(latitude, longitude, (address) => {
+                    document.getElementById('location').value = address;
+                    document.getElementById('loginForm').submit();
+                });
+            }, () => {
+                alert("위치 정보를 가져오는 데 실패했습니다.");
+            });
+        } else {
+            alert("브라우저가 위치 정보를 지원하지 않습니다.");
+        }
+    }
+
+    // 위도와 경도를 주소로 변환하는 함수
+    function convertLatLngToAddress(latitude, longitude, callback) {
+        const apiKey = "AIzaSyAGgvPzN57_n5tGKb1sNvZJgg6Ogiv1CkY";  // 올바른 Google Geocoding API 키를 넣으세요
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok: " + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === "OK" && data.results[0]) {
+                    const address = data.results[0].formatted_address;
+                    console.log("Converted Address: ", address);  // 주소 출력
+                    callback(address);  // 콜백으로 주소 전달
+                } else {
+                    console.error("Geocoding API Error: ", data);
+                    alert("주소 변환에 실패했습니다.");
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching address: ", error);
+                alert("주소를 가져오는 중 오류가 발생했습니다.");
+            });
+    }
+
     // 카카오 SDK 초기화
     Kakao.init('927a95bf736c3c38b71efd1f892afae4'); // JavaScript 키
 
