@@ -30,8 +30,15 @@
                     로그인
                 </button>
             </li>
-            <li class="nav-item" th:if="${session.loggedInUser != null}">
-                <span class="navbar-text mr-2" th:text="${session.loggedInUser.username + ' 님 안녕하세요'}"></span>
+            <li class="nav-item d-flex align-items-center" th:if="${session.loggedInUser != null}">
+                <!-- 프로필 이미지와 이름을 클릭하면 회원 정보 수정 페이지로 이동 -->
+                <a th:href="@{/edit-profile}" class="d-flex align-items-center text-decoration-none mr-2">
+                    <img th:if="${session.loggedInUser.profileImage != null}"
+                         th:src="${session.loggedInUser.profileImage}"
+                         alt="Profile Image" class="rounded-circle mr-2"
+                         style="width: 30px; height: 30px;">
+                    <span class="navbar-text" th:text="${session.loggedInUser.username + ' 님 안녕하세요'}"></span>
+                </a>
                 <a th:href="@{/logout}" class="btn btn-orange">로그아웃</a>
             </li>
         </ul>
@@ -116,7 +123,7 @@
 </div>
 
 <!-- Bootstrap JS 및 종속성 -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> <!-- jQuery Full 버전 -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
@@ -157,8 +164,7 @@
 
     // 위도와 경도를 주소로 변환하는 함수
     function convertLatLngToAddress(latitude, longitude, callback) {
-        const apiKey = "AIzaSyAGgvPzN57_n5tGKb1sNvZJgg6Ogiv1CkY";  // 올바른 Google Geocoding API 키를 넣으세요
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
+        const url = `/get-address?latitude=${latitude}&longitude=${longitude}`;
 
         fetch(url)
             .then(response => {
