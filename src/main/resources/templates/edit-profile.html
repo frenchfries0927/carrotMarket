@@ -152,28 +152,48 @@
 
     // 비밀번호 확인 유효성 검사
     function validatePassword() {
+        const currentPassword = document.getElementById('currentPassword').value;
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
-        const currentPassword = document.getElementById('currentPassword').value;
-        const passwordError = document.getElementById('passwordError');
         const currentPasswordError = document.getElementById('currentPasswordError');
+        const passwordError = document.getElementById('passwordError');
 
-        if (!currentPassword) {
-            currentPasswordError.style.display = 'block';
-            return false;
-        } else {
-            currentPasswordError.style.display = 'none';
-        }
+        let isValid = true;
 
+        // 현재 비밀번호 확인
+        $.ajax({
+            url: '/check-password',
+            method: 'POST',
+            data: { currentPassword: currentPassword },
+            async: false,  // 동기 방식으로 처리하여 폼 제출 전에 완료되도록 함
+            success: function(isMatch) {
+                if (!isMatch) {
+                    currentPasswordError.style.display = 'block';
+                    isValid = false;
+                } else {
+                    currentPasswordError.style.display = 'none';
+                }
+            }
+        });
+
+        // 새 비밀번호와 확인 비밀번호가 일치하는지 확인
         if (password && password !== confirmPassword) {
             passwordError.style.display = 'block';
-            return false;
+            isValid = false;
         } else {
             passwordError.style.display = 'none';
         }
 
-        return true;
+        return isValid;
     }
+
+    // 입력 시마다 오류 메시지 제거
+    document.getElementById('currentPassword').addEventListener('input', () => {
+        document.getElementById('currentPasswordError').style.display = 'none';
+    });
+    document.getElementById('confirmPassword').addEventListener('input', () => {
+        document.getElementById('passwordError').style.display = 'none';
+    });
 
     // Kakao API 주소 검색
     function searchAddress() {

@@ -199,10 +199,10 @@ public class UserController {
 
             User loggedInUser = userService.getLoggedInUser(session);
 
-            // 현재 비밀번호 확인
-            if (!loggedInUser.getPassword().equals(currentPassword)) {
-                return "redirect:/edit-profile?error=passwordMismatch";
-            }
+//            // 현재 비밀번호 확인
+//            if (!loggedInUser.getPassword().equals(currentPassword)) {
+//                return "redirect:/edit-profile?error=passwordMismatch";
+//            }
 
             // 새 비밀번호가 입력되지 않은 경우 현재 비밀번호로 유지
             if (user.getPassword() == null || user.getPassword().isEmpty()) {
@@ -220,6 +220,12 @@ public class UserController {
             e.printStackTrace();
             return "redirect:/edit-profile?error=true";
         }
+    }
+    @PostMapping("/check-password")
+    @ResponseBody
+    public boolean checkPassword(@RequestParam("currentPassword") String currentPassword, HttpSession session) {
+        User loggedInUser = userService.getLoggedInUser(session);
+        return loggedInUser != null && loggedInUser.getPassword().equals(currentPassword);
     }
 
 

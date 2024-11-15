@@ -119,22 +119,30 @@ public class UserService {
             // 필요에 따라 비밀번호 암호화 추가 가능
         }
 
-        // 프로필 이미지가 비어 있지 않다면 파일 저장
-        if (profileImageFile != null && !profileImageFile.isEmpty()) {
-            String fileName = saveProfileImage(profileImageFile, user);
-            user.setProfileImage(fileName);
-        }
-        //신규 회원인 경우 기본 권한인 GENERAL로 설정.
-        if(user.getUserGroup()==null && user.getId()==null) {
-            user.setUserGroup("GENERAL");
-        }
-
-        // 사용자 정보 저장 (신규 사용자일 경우 회원가입, 기존 사용자일 경우 업데이트)
-        // 데이터베이스에 사용자 저장 또는 업데이트
+        // 사용자 조회
         User existingUser = userMapper.findByEmail(user.getEmail());
+
         if (existingUser == null) {
+            // 신규 회원인 경우
+            if (profileImageFile != null && !profileImageFile.isEmpty()) {
+                String fileName = saveProfileImage(profileImageFile, user);
+                user.setProfileImage(fileName);
+            }
+            user.setUserGroup("GENERAL"); // 기본 사용자 그룹 설정
             userMapper.insertUser(user); // 새 사용자 추가
         } else {
+            // 기존 사용자 업데이트
+            user.setId(existingUser.getId()); // 기존 ID 유지
+
+            if (profileImageFile != null && !profileImageFile.isEmpty()) {
+                // 새 프로필 이미지가 업로드된 경우만 저장
+                String fileName = saveProfileImage(profileImageFile, user);
+                user.setProfileImage(fileName);
+            } else {
+                // 새 이미지가 없으면 기존 이미지 유지
+                user.setProfileImage(existingUser.getProfileImage());
+            }
+
             userMapper.updateUser(user); // 기존 사용자 업데이트
         }
     }
