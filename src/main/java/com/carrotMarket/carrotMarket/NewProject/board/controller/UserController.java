@@ -53,7 +53,7 @@ public class UserController {
     public String registerUser(@ModelAttribute("user") User user,
                                @RequestParam("profileImageFile") MultipartFile profileImageFile,
                                HttpSession session) throws IOException {
-        //중복되는 코드....service 단 saveOrUpdateUser 에서 동일하게 수행.
+//중복되는 코드....service 단 saveOrUpdateUser 에서 동일하게 수행.
 //        if (!profileImageFile.isEmpty()) {
 //            String filePath = saveProfileImage(profileImageFile, user);
 //            if (filePath == null) {
@@ -122,6 +122,7 @@ public class UserController {
         session.invalidate();
         return "redirect:/board/list";
     }
+
     @GetMapping("/get-address")
     @ResponseBody
     public String getAddress(@RequestParam double latitude, @RequestParam double longitude) {

@@ -47,14 +47,15 @@ public class UserService {
         return userMapper.findByEmail(email);
     }
 
-
     public boolean emailExists(String email) {
 
         return userMapper.findByEmail(email) != null;
     }
+
     public void save(User user) {
         userMapper.insertUser(user);
     }
+
     // 카카오 로그인 메소드 추가
     public User kakaoLogin(String email, String username, HttpSession session) {
         User user = userMapper.findByEmail(email);
@@ -77,7 +78,6 @@ public class UserService {
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
-
 
         String fileExtension = profileImageFile.getOriginalFilename()
                 .substring(profileImageFile.getOriginalFilename().lastIndexOf("."));

@@ -15,78 +15,10 @@
         .btn-orange:hover { background-color: #e6762d; color: white; }
     </style>
 </head>
-<body onload="checkLoginError()">
-
-<!-- 네비게이션 바 -->
-<nav class="navbar navbar-expand-lg navbar-light">
-    <a class="navbar-brand" href="#">당근마켓</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item" th:if="${session.loggedInUser == null}">
-                <button type="button" class="btn btn-orange" data-toggle="modal" data-target="#loginModal">
-                    로그인
-                </button>
-            </li>
-            <li class="nav-item d-flex align-items-center" th:if="${session.loggedInUser != null}">
-                <!-- 프로필 이미지와 이름을 클릭하면 회원 정보 수정 페이지로 이동 -->
-                <a th:href="@{/edit-profile}" class="d-flex align-items-center text-decoration-none mr-2">
-                    <img th:if="${session.loggedInUser.profileImage != null}"
-                         th:src="${session.loggedInUser.profileImage}"
-                         alt="Profile Image" class="rounded-circle mr-2"
-                         style="width: 30px; height: 30px;">
-                    <span class="navbar-text" th:text="${session.loggedInUser.username + ' 님 안녕하세요'}"></span>
-                </a>
-                <a th:href="@{/logout}" class="btn btn-orange">로그아웃</a>
-            </li>
-        </ul>
-    </div>
-</nav>
-
-<!-- 로그인 모달 -->
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="loginModalLabel">로그인</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="loginForm" action="/login" method="post">
-                    <div class="form-group">
-                        <label for="email">이메일 주소</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="이메일을 입력하세요" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">비밀번호</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
-                    </div>
-                    <!--로그인 시 사용자 위치 정보 수집-->
-                    <input type="hidden" id="latitude" name="latitude">
-                    <input type="hidden" id="longitude" name="longitude">
-                    <input type="hidden" id="location" name="location">
-<!--                    <button type="submit" class="btn btn-orange btn-block" onclick="getLocationAndSubmit()">로그인</button>-->
-                    <button type="submit" class="btn btn-orange btn-block" onclick="event.preventDefault(); getLocationAndSubmit();">로그인</button>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <span>아직 회원이 아니신가요?</span>
-                <a href="/register" class="ml-2">회원가입</a>
-            </div>
-            <!-- 카카오 로그인 버튼 -->
-            <div class="text-center mt-3">
-                <button type="button" onclick="kakaoLogin()" class="btn btn-warning btn-block" style="background-color: #FEE500; color: #3C1E1E; font-weight: bold;">
-                    카카오 로그인
-                </button>
-            </div>
-
-        </div>
-    </div>
-</div>
+<!--<body onload="checkLoginError()">-->
+<body>
+<!-- 공통 헤더 포함 -->
+<div th:replace="fragments/header :: header"></div>
 
 <!-- 메인 컨테이너 -->
 <div class="container mt-5">
@@ -127,121 +59,121 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
-<script>
+<!--<script>-->
 
-    //로그인 체크(이메일 비번이 다른 경우 다시 로그인창으로 리다이렉트
-    function checkLoginError() {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('loginError')) {
-            alert('이메일 또는 비밀번호가 잘못되었습니다.');
-            $('#loginModal').modal('show'); // 로그인 모달 다시 표시
-            document.getElementById('password').value = ''; // 비밀번호 필드 지우기
-        }
-    }
-    //로그인 시 위치정보 가져오기.
-    function getLocationAndSubmit() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
+<!--    //로그인 체크(이메일 비번이 다른 경우 다시 로그인창으로 리다이렉트-->
+<!--    function checkLoginError() {-->
+<!--        const urlParams = new URLSearchParams(window.location.search);-->
+<!--        if (urlParams.has('loginError')) {-->
+<!--            alert('이메일 또는 비밀번호가 잘못되었습니다.');-->
+<!--            $('#loginModal').modal('show'); // 로그인 모달 다시 표시-->
+<!--            document.getElementById('password').value = ''; // 비밀번호 필드 지우기-->
+<!--        }-->
+<!--    }-->
+<!--    //로그인 시 위치정보 가져오기.-->
+<!--    function getLocationAndSubmit() {-->
+<!--        if (navigator.geolocation) {-->
+<!--            navigator.geolocation.getCurrentPosition((position) => {-->
+<!--                const latitude = position.coords.latitude;-->
+<!--                const longitude = position.coords.longitude;-->
 
-                // 위도와 경도를 hidden input 필드에 설정
-                document.getElementById('latitude').value = latitude;
-                document.getElementById('longitude').value = longitude;
+<!--                // 위도와 경도를 hidden input 필드에 설정-->
+<!--                document.getElementById('latitude').value = latitude;-->
+<!--                document.getElementById('longitude').value = longitude;-->
 
-                // 위치 정보를 주소로 변환 후 폼 제출
-                convertLatLngToAddress(latitude, longitude, (address) => {
-                    document.getElementById('location').value = address;
-                    document.getElementById('loginForm').submit();
-                });
-            }, () => {
-                alert("위치 정보를 가져오는 데 실패했습니다.");
-            });
-        } else {
-            alert("브라우저가 위치 정보를 지원하지 않습니다.");
-        }
-    }
+<!--                // 위치 정보를 주소로 변환 후 폼 제출-->
+<!--                convertLatLngToAddress(latitude, longitude, (address) => {-->
+<!--                    document.getElementById('location').value = address;-->
+<!--                    document.getElementById('loginForm').submit();-->
+<!--                });-->
+<!--            }, () => {-->
+<!--                alert("위치 정보를 가져오는 데 실패했습니다.");-->
+<!--            });-->
+<!--        } else {-->
+<!--            alert("브라우저가 위치 정보를 지원하지 않습니다.");-->
+<!--        }-->
+<!--    }-->
 
-    // 위도와 경도를 주소로 변환하는 함수
-    function convertLatLngToAddress(latitude, longitude, callback) {
-        const url = `/get-address?latitude=${latitude}&longitude=${longitude}`;
+<!--    // 위도와 경도를 주소로 변환하는 함수-->
+<!--    function convertLatLngToAddress(latitude, longitude, callback) {-->
+<!--        const url = `/get-address?latitude=${latitude}&longitude=${longitude}`;-->
 
-        fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok: " + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.status === "OK" && data.results[0]) {
-                    const address = data.results[0].formatted_address;
-                    console.log("Converted Address: ", address);  // 주소 출력
-                    callback(address);  // 콜백으로 주소 전달
-                } else {
-                    console.error("Geocoding API Error: ", data);
-                    alert("주소 변환에 실패했습니다.");
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching address: ", error);
-                alert("주소를 가져오는 중 오류가 발생했습니다.");
-            });
-    }
+<!--        fetch(url)-->
+<!--            .then(response => {-->
+<!--                if (!response.ok) {-->
+<!--                    throw new Error("Network response was not ok: " + response.statusText);-->
+<!--                }-->
+<!--                return response.json();-->
+<!--            })-->
+<!--            .then(data => {-->
+<!--                if (data.status === "OK" && data.results[0]) {-->
+<!--                    const address = data.results[0].formatted_address;-->
+<!--                    console.log("Converted Address: ", address);  // 주소 출력-->
+<!--                    callback(address);  // 콜백으로 주소 전달-->
+<!--                } else {-->
+<!--                    console.error("Geocoding API Error: ", data);-->
+<!--                    alert("주소 변환에 실패했습니다.");-->
+<!--                }-->
+<!--            })-->
+<!--            .catch(error => {-->
+<!--                console.error("Error fetching address: ", error);-->
+<!--                alert("주소를 가져오는 중 오류가 발생했습니다.");-->
+<!--            });-->
+<!--    }-->
 
-    // 카카오 SDK 초기화
-    Kakao.init('927a95bf736c3c38b71efd1f892afae4'); // 실제 JavaScript 키로 변경
+<!--    // 카카오 SDK 초기화-->
+<!--    Kakao.init('927a95bf736c3c38b71efd1f892afae4'); // 실제 JavaScript 키로 변경-->
 
-    // 카카오 로그인 함수
-    function kakaoLogin() {
-        Kakao.Auth.login({
-            success: function(authObj) {
-                // 로그인 성공 시, 사용자 정보 요청
-                Kakao.API.request({
-                    url: '/v2/user/me',
-                    success: function(res) {
-                        const kakaoAccount = res.kakao_account;
+<!--    // 카카오 로그인 함수-->
+<!--    function kakaoLogin() {-->
+<!--        Kakao.Auth.login({-->
+<!--            success: function(authObj) {-->
+<!--                // 로그인 성공 시, 사용자 정보 요청-->
+<!--                Kakao.API.request({-->
+<!--                    url: '/v2/user/me',-->
+<!--                    success: function(res) {-->
+<!--                        const kakaoAccount = res.kakao_account;-->
 
-                        // 이메일 정보 확인
-                        if (kakaoAccount.email) {
-                            const email = kakaoAccount.email;
-                            const nickname = kakaoAccount.profile.nickname;
+<!--                        // 이메일 정보 확인-->
+<!--                        if (kakaoAccount.email) {-->
+<!--                            const email = kakaoAccount.email;-->
+<!--                            const nickname = kakaoAccount.profile.nickname;-->
 
-                            // 서버로 카카오 계정 정보를 전송
-                            $.ajax({
-                                url: '/kakaoLogin',
-                                method: 'POST',
-                                data: { email: email, username: nickname },
-                                success: function(response) {
-                                    if (response.success) {
-                                        window.location.href = '/';
-                                    } else {
-                                        alert('로그인에 실패했습니다.');
-                                    }
-                                },
-                                error: function() {
-                                    alert('로그인 요청 중 오류가 발생했습니다.');
-                                }
-                            });
-                        } else {
-                            // 이메일 정보가 없는 경우의 처리
-                            alert('이메일 정보를 제공받을 수 없습니다. 카카오 계정 설정에서 이메일 정보 제공 동의를 확인해주세요.');
-                        }
-                    },
-                    fail: function(error) {
-                        console.log(error);
-                        alert('사용자 정보 요청에 실패했습니다.');
-                    }
-                });
-            },
-            fail: function(err) {
-                alert('카카오 로그인에 실패했습니다.');
-                console.log(err);
-            }
-        });
-    }
+<!--                            // 서버로 카카오 계정 정보를 전송-->
+<!--                            $.ajax({-->
+<!--                                url: '/kakaoLogin',-->
+<!--                                method: 'POST',-->
+<!--                                data: { email: email, username: nickname },-->
+<!--                                success: function(response) {-->
+<!--                                    if (response.success) {-->
+<!--                                        window.location.href = '/';-->
+<!--                                    } else {-->
+<!--                                        alert('로그인에 실패했습니다.');-->
+<!--                                    }-->
+<!--                                },-->
+<!--                                error: function() {-->
+<!--                                    alert('로그인 요청 중 오류가 발생했습니다.');-->
+<!--                                }-->
+<!--                            });-->
+<!--                        } else {-->
+<!--                            // 이메일 정보가 없는 경우의 처리-->
+<!--                            alert('이메일 정보를 제공받을 수 없습니다. 카카오 계정 설정에서 이메일 정보 제공 동의를 확인해주세요.');-->
+<!--                        }-->
+<!--                    },-->
+<!--                    fail: function(error) {-->
+<!--                        console.log(error);-->
+<!--                        alert('사용자 정보 요청에 실패했습니다.');-->
+<!--                    }-->
+<!--                });-->
+<!--            },-->
+<!--            fail: function(err) {-->
+<!--                alert('카카오 로그인에 실패했습니다.');-->
+<!--                console.log(err);-->
+<!--            }-->
+<!--        });-->
+<!--    }-->
 
-</script>
+<!--</script>-->
 
 </body>
 </html>

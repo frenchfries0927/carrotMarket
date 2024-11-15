@@ -11,7 +11,6 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
-//주우어서어억
 public class User implements Serializable {
     private Long id;
     private String username;

@@ -22,7 +22,9 @@ public interface UserMapper {
     @Select("SELECT * FROM user")
     List<User> selectAllUsers();
 
-    @Update("UPDATE user SET username = #{username}, password = #{password}, email = #{email}, location = #{location}, latitude = #{latitude}, longitude = #{longitude}, profileImage = #{profileImage}, userGroup = #{userGroup} WHERE id = #{id}")
+    @Update("UPDATE user SET username = #{username}, password = #{password}, email = #{email}, " +
+            "location = #{location}, latitude = #{latitude}, longitude = #{longitude}, " +
+            "profileImage = #{profileImage}, userGroup = #{userGroup} WHERE id = #{id}")
     void updateUser(User user);
 
     @Delete("DELETE FROM user WHERE id = #{id}")
